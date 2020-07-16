@@ -22,14 +22,7 @@ func parseArgs(args []string) *issueConfig {
 	}
 }
 
-func main() {
-	fmt.Println("Format: fetchin -[owner name] -[repo name] -[issue label]")
-
-	info := os.Args
-
-	issueInfo := parseArgs(info)
-
-	fmt.Println(issueInfo.repoName)
+func getIssue(issueInfo *issueConfig) {
 
 	ctx := context.Background()
 	client := github.NewClient(nil)
@@ -37,12 +30,26 @@ func main() {
 	issList, _, _ := client.Issues.ListByRepo(ctx, issueInfo.ownerName, issueInfo.repoName, nil)
 	//val := issList[0]
 	for _, issue := range issList {
-		//fmt.Println(val, "\n\n=====================================\n\n")
 		for _, label := range issue.Labels {
 			if label.GetName() == issueInfo.issueLabel {
 				fmt.Println(issue.GetNumber(), "\t\t", issue.GetURL())
 			}
 		}
-
 	}
+
+}
+
+func main() {
+
+	//fmt.Println("Format: fetchin -[owner name] -[repo name] -[issue label]")
+
+	info := os.Args
+
+	issueInfo := parseArgs(info)
+
+	err := getIssue(issueInfo)
+	if err != nil {
+		fmt.Println("Error: ", err)
+	}
+
 }
