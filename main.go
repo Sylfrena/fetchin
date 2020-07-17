@@ -47,9 +47,5 @@ func main() {
 
 	issueInfo := parseArgs(info)
 
-	err := getIssue(issueInfo)
-	if err != nil {
-		fmt.Println("Error: ", err)
-	}
-
+	getIssue(issueInfo)
 }
