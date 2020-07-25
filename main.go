@@ -14,15 +14,23 @@ type issueConfig struct {
 	repoName  string
 }
 
-func parseArgs(args []string) *issueConfig {
-	argSplit := strings.Split(args[0], ":")
-	
+func parseArgs(args []string) []*issueConfig {
 
-	
-	return &issueConfig{
-		ownerName: string(argSplit[0]),
-		repoName:  string(argSplit[1]),
+	issueSlice := make([]*issueConfig, len(args))
+
+	for index, issueArgs := range args {
+		argSplitty := strings.Split(issueArgs, ":")
+		issueSlice[index] = &issueConfig{
+			ownerName: string(strings.Trim(argSplitty[0], " ")),
+			repoName:  string(strings.Trim(argSplitty[1], " ")),
+		}
 	}
+
+	for _, j := range issueSlice {
+		fmt.Println(*j)
+	}
+
+	return issueSlice
 }
 
 func getIssue(issueInfo *issueConfig, limit int, issueLabel string) {
@@ -32,13 +40,14 @@ func getIssue(issueInfo *issueConfig, limit int, issueLabel string) {
 	count := 1
 
 	issList, _, _ := client.Issues.ListByRepo(ctx, issueInfo.ownerName, issueInfo.repoName, nil)
-	//val := issList[0]
+
 	for _, issue := range issList {
 		for _, label := range issue.Labels {
 			if label.GetName() == issueLabel && count <= limit {
 				fmt.Println(issue.GetNumber(), "\t\t", issue.GetURL())
 				count++
 			}
+
 		}
 	}
 
@@ -56,14 +65,15 @@ func main() {
 
 	//issueInfo := make([]*issueConfig, len(info))
 	issueInfo := parseArgs(info)
+	labelParse := strings.Split(*label, ",")
 
 	//support for multiple labels
-	labelParse := strings.Split(*label, ",")
-	for _, label := range labelParse {
-		fmt.Println("-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\nFor label = ", strings.Trim(label, " "))
-		getIssue(issueInfo, *limit, strings.Trim(label, " "))
+	for _, issueDetails := range issueInfo {
+		fmt.Println("\n\n\n=============================================================================================\n\nFor ", issueDetails)
+		for _, label := range labelParse {
+			fmt.Println("\n----------------------------------------------------------------------------------------\n\nFor label = ", strings.Trim(label, " "))
+			getIssue(issueInfo[0], *limit, strings.Trim(label, " "))
+		}
 
 	}
-
-	//	fmt.Println("limit:", *limit, label_parse[1])
 }
