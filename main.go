@@ -45,14 +45,21 @@ func main() {
 	//fmt.Println("Format: fetchin -[owner name] -[repo name] -[issue label]")
 
 	limit := flag.Int("limit", 10, "maximum number of results")
-	label := flag.String("label", "beginner", "issue label")
+	label := flag.String("label", "bug: major", "issue label")
 	flag.Parse()
-
+	//label := "bug: minor"
 	info := flag.Args()
 
+	//issueInfo := make([]*issueConfig, len(info))
 	issueInfo := parseArgs(info)
 
-	getIssue(issueInfo, *limit, *label)
+	//support for multiple labels
+	labelParse := strings.Split(*label, ",")
+	for _, label := range labelParse {
+		fmt.Println("-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\nFor label = ", strings.Trim(label, " "))
+		getIssue(issueInfo, *limit, strings.Trim(label, " "))
 
-	fmt.Println("limit:", *limit, *label)
+	}
+
+	//	fmt.Println("limit:", *limit, label_parse[1])
 }
