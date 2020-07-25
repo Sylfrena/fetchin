@@ -4,20 +4,24 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"strings"
 
 	"github.com/google/go-github/github"
 )
 
 type issueConfig struct {
-	ownerName  string
-	repoName   string
-	issueLabel string
+	ownerName string
+	repoName  string
 }
 
 func parseArgs(args []string) *issueConfig {
+	argSplit := strings.Split(args[0], ":")
+	
+
+	
 	return &issueConfig{
-		ownerName: string(args[0]),
-		repoName:  string(args[1]),
+		ownerName: string(argSplit[0]),
+		repoName:  string(argSplit[1]),
 	}
 }
 
