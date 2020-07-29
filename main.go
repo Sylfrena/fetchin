@@ -14,6 +14,24 @@ type issueConfig struct {
 	repoName  string
 }
 
+type githubService struct {
+	client *github.Client
+	ctx    context.Context
+}
+
+func newGithubService() *githubService {
+	return &githubService{
+		client: github.NewClient(nil),
+		ctx:    context.Background(),
+	}
+}
+
+func (github *githubService) Get(issueInfo *issueConfig) []*github.Issue {
+
+	issList, _, _ := github.client.Issues.ListByRepo(github.ctx, issueInfo.ownerName, issueInfo.repoName, nil)
+	return issList
+}
+
 func parseArgs(args []string) []*issueConfig {
 
 	issueSlice := make([]*issueConfig, len(args))
@@ -33,13 +51,10 @@ func parseArgs(args []string) []*issueConfig {
 	return issueSlice
 }
 
-func getIssue(issueInfo *issueConfig, limit int, issueLabel string) {
-
-	ctx := context.Background()
-	client := github.NewClient(nil)
+func getIssue(service *githubService, issueInfo *issueConfig, limit int, issueLabel string) {
 	count := 1
 
-	issList, _, _ := client.Issues.ListByRepo(ctx, issueInfo.ownerName, issueInfo.repoName, nil)
+	issList := service.Get(issueInfo)
 
 	for _, issue := range issList {
 		for _, label := range issue.Labels {
@@ -56,6 +71,7 @@ func getIssue(issueInfo *issueConfig, limit int, issueLabel string) {
 func main() {
 
 	//fmt.Println("Format: fetchin -[owner name] -[repo name] -[issue label]")
+	gitService := newGithubService()
 
 	limit := flag.Int("limit", 10, "maximum number of results")
 	label := flag.String("label", "bug: major", "issue label")
@@ -72,7 +88,7 @@ func main() {
 		fmt.Println("\n\n\n=============================================================================================\n\nFor ", issueDetails)
 		for _, label := range labelParse {
 			fmt.Println("\n----------------------------------------------------------------------------------------\n\nFor label = ", strings.Trim(label, " "))
-			getIssue(issueInfo[0], *limit, strings.Trim(label, " "))
+			getIssue(gitService, issueInfo[0], *limit, strings.Trim(label, " "))
 		}
 
 	}
