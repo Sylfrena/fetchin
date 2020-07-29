@@ -88,7 +88,7 @@ func main() {
 		fmt.Println("\n\n\n=============================================================================================\n\nFor ", issueDetails)
 		for _, label := range labelParse {
 			fmt.Println("\n----------------------------------------------------------------------------------------\n\nFor label = ", strings.Trim(label, " "))
-			getIssue(gitService, issueInfo[0], *limit, strings.Trim(label, " "))
+			getIssue(gitService, issueDetails, *limit, strings.Trim(label, " "))
 		}
 
 	}
