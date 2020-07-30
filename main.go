@@ -9,6 +9,10 @@ import (
 	"github.com/google/go-github/github"
 )
 
+type Dependency interface {
+	Get(issueInfo *issueConfig) []*github.Issue
+}
+
 type issueConfig struct {
 	ownerName string
 	repoName  string
@@ -51,17 +55,18 @@ func parseArgs(args []string) []*issueConfig {
 	return issueSlice
 }
 
-func getIssue(service *githubService, issueInfo *issueConfig, limit int, issueLabel string) {
+func getIssue(service Dependency, issueInfo *issueConfig, limit int, issueLabel string) {
 	count := 1
 
 	issList := service.Get(issueInfo)
 
 	for _, issue := range issList {
 		for _, label := range issue.Labels {
-			if label.GetName() == issueLabel && count <= limit {
+			if label.GetName() == issueLabel && count <= limit { //add clause if label != pr
 				fmt.Println(issue.GetNumber(), "\t\t", issue.GetURL())
 				count++
 			}
+			//			fmt.Println(label.GetName(), issue.GetURL())
 
 		}
 	}
